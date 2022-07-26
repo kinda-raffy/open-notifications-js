@@ -1,0 +1,107 @@
+@keyframes flyInRight {
+    0% { transform: translateX(100%); }
+    70% { transform: translateX(-10%); }
+    100% { transform: translateX(0); }
+}
+
+
+div.open-noti-js {
+    /*Flex Properties*/
+    display: flex;
+
+    flex-direction: column;
+    flex-wrap: nowrap;
+    row-gap: 10px;
+
+    align-items: center;
+    align-content: flex-start;
+    justify-content: center;
+
+    /*Positioning*/
+    position: fixed;
+    bottom: 2%; right: 1%;
+    min-height: 7%;
+    width: 16%;
+
+    /*Colors*/
+    background-color: black;
+    border-radius: 5px;
+    border: 1px solid black;
+
+    /*Animation*/
+    animation: 0.2s ease-in 0s 1 flyInRight;
+    transition: all 0.4s ease-out;
+}
+
+.open-noti-js:hover {
+    border: darkred solid 1px;
+    box-shadow: 5px 5px 25px 5px rgba(139, 0, 0, 0.5) inset;
+    cursor: pointer;
+
+}
+
+
+.open-noti-js:focus {
+    -webkit-animation: flyInRight 0.2s ease-in backwards;
+    animation: flyInRight 0.2s ease-in backwards;
+}
+
+
+.open-noti-js:active {
+    -webkit-animation: none;
+    animation: none;
+}
+
+
+.open-noti-js:hover p {
+    opacity: 70%;
+    transition: opacity 0.4s ease-out;
+}
+
+.open-noti-js p {
+    position: relative;
+    top: -5px;
+
+    color: floralwhite;
+    font-family: 'Atkinson Hyperlegible', Roboto, sans-serif;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: bottom;
+    margin: 5px 5px 5px;
+}
+
+
+.open-noti-js progress[value] {
+    position: relative;
+    top: -4px;
+
+    /* Reset the default appearance */
+    -webkit-appearance: none;
+    appearance: none;
+
+    height: 4px;
+    width: 98%;
+}
+
+
+.open-noti-js progress[value]::-webkit-progress-bar {
+    border-radius: 2px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+    background-color: #212121;
+}
+
+
+.open-noti-js progress[value]::-webkit-progress-value {
+    background-image:
+            -webkit-linear-gradient(-45deg,
+            transparent 33%, rgba(0, 0, 0, .1) 33%,
+            rgba(0,0, 0, .1) 66%, transparent 66%),
+            -webkit-linear-gradient(top,
+            rgba(255, 255, 255, .25),
+            rgba(0, 0, 0, .25)),
+            -webkit-linear-gradient(left, #09c, #f44);
+
+    border-radius: 3px;
+    background-size: 35px 20px, 100% 100%, 100% 100%;
+}
