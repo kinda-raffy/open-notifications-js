@@ -45,10 +45,9 @@ class WaitQueue {
     }
 }
 class DisplayList {
-    constructor(container) {
+    constructor() {
         this.head = null;
         this.currentHeight = 15; // Starting position of first noti box.
-        this.container = container;
     }
     append(_noti) {
         const node = new NotiNode(_noti);
@@ -180,15 +179,18 @@ class DisplayList {
     }
 }
 class OpenNotification {
-    constructor(container) {
+    constructor() {
         this.notiQueue = new WaitQueue();
-        this.notiList = new DisplayList(container);
-        setInterval(() => {
-            this.updateList();
-        }, 500);
+        this.notiList = new DisplayList();
+        this.startNotiScanner();
     }
     add(noti) {
         this.notiQueue.append(noti);
+    }
+    startNotiScanner() {
+        setInterval(() => {
+            this.updateList();
+        }, 500);
     }
     updateList() {
         const noti = this.notiQueue.pop();
@@ -200,11 +202,18 @@ class OpenNotification {
         }
     }
 }
-const ON = new OpenNotification(document.body);
-function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+function demo() {
+    // Random number generator.
+    function getRndInteger(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+    // Create open notification instance.
+    const ON = new OpenNotification();
+    // Add as many notifications as you wish!
+    // OpenNoti will automatically manage when to display notifications.
+    for (let i = 1; i <= 2000; i++) {
+        const dur = getRndInteger(1000, 8000);
+        ON.add({ message: `${i}: Hello: ${dur}.`, duration: dur });
+    }
 }
-for (let i = 1; i <= 2000; i++) {
-    const dur = getRndInteger(1000, 8000);
-    ON.add({ message: `${i}: Duration: ${dur}.`, duration: dur });
-}
+demo();

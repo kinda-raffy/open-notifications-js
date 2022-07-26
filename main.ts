@@ -2,8 +2,8 @@
 interface Noti {
     message: string;
     duration: number;
-    colour?: string;
-    type?: 'success' | 'error' | 'warning';
+    colour?: string; // Optional.             // TODO: Add colour support.
+    type?: 'success' | 'error' | 'warning';   // TODO: Have images for common notification types.
 }
 
 class NotiNode<Noti> {
@@ -72,11 +72,6 @@ interface ILinkedList {
 class DisplayList implements ILinkedList {
     private head: NotiNode<Noti> | null = null;
     private currentHeight: number = 15;  // Starting position of first noti box.
-    private container: HTMLElement;
-
-    constructor(container: HTMLElement) {
-        this.container = container;
-    }
 
     append(_noti: Noti): boolean {
         const node = new NotiNode(_noti);
@@ -111,6 +106,7 @@ class DisplayList implements ILinkedList {
         notiBox.style.visibility = "hidden";
         // Append elements to DOM.
         document.body.appendChild(notiBox);
+
         notiBox.appendChild(notiProgress);
         notiBox.appendChild(notiText);
         // Determine height of noti.
@@ -212,18 +208,20 @@ class DisplayList implements ILinkedList {
 
 class OpenNotification {
     private notiQueue: WaitQueue = new WaitQueue();
-    private notiList: DisplayList;
+    private notiList: DisplayList = new DisplayList();
 
-    constructor(container: HTMLElement) {
-        this.notiList = new DisplayList(container);
-
-        setInterval(() => {
-           this.updateList();
-        }, 500);
+    constructor() {
+        this.startNotiScanner();
     }
 
     public add(noti: Noti): void {
         this.notiQueue.append(noti);
+    }
+
+    private startNotiScanner(): void {
+        setInterval(() => {
+            this.updateList();
+        }, 500);
     }
 
     private updateList(): void {
@@ -238,14 +236,21 @@ class OpenNotification {
 }
 
 
+function demo() {
+    // Random number generator.
+    function getRndInteger(min: number, max: number) : number {
+        return Math.floor(Math.random() * (max - min) ) + min;
+    }
 
-function getRndInteger(min: number, max: number) : number {
-    return Math.floor(Math.random() * (max - min) ) + min;
+    // Create open notification instance.
+    const ON = new OpenNotification();
+
+    // Add as many notifications as you wish!
+    // OpenNoti will automatically manage when to display notifications.
+    for (let i = 1; i <= 2000; i++) {
+        const dur: number = getRndInteger(1000, 8000);
+        ON.add({message: `${i}: Hello: ${dur}.`, duration: dur});
+    }
 }
 
-const ON = new OpenNotification(document.body);
-
-for (let i = 1; i <= 2000; i++) {
-    const dur: number = getRndInteger(1000, 8000);
-    ON.add({message: `${i}: Duration: ${dur}.`, duration: dur});
-}
+demo();
