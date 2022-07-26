@@ -68,24 +68,39 @@ class DisplayList {
         }
         return true;
     }
+    remove(node) {
+        // Empty list.
+        if (this.head === null) {
+            return;
+        }
+        // Remove from head.
+        if (this.head === node) {
+            this.head = this.head.next;
+            this.decrementNotiBoxes(node);
+            return;
+        }
+        // Remove from middle and tail.
+        let current = this.head;
+        while (current.next !== null) {
+            if (current.next === node) {
+                current.next = current.next.next;
+                this.decrementNotiBoxes(node);
+                return;
+            }
+            current = current.next;
+        }
+    }
+    size() {
+        let count = 0;
+        let current = this.head;
+        while (current !== null) {
+            count++;
+            current = current.next;
+        }
+        return count;
+    }
     displayNoti(node) {
-        // Noti Box Container.
-        const notiBox = document.createElement("div");
-        notiBox.setAttribute("class", "open-noti-js");
-        // Noti Text.
-        const notiText = document.createElement("p");
-        notiText.appendChild(document.createTextNode(node.noti.message));
-        notiText.setAttribute("class", "open-noti-js");
-        // Noti Progress Bar.
-        const notiProgress = document.createElement("progress");
-        notiProgress.setAttribute("class", "open-noti-js");
-        notiProgress.max = 100;
-        // Render invisible noti to determine height.
-        notiBox.style.visibility = "hidden";
-        // Append elements to DOM.
-        document.body.appendChild(notiBox);
-        notiBox.appendChild(notiProgress);
-        notiBox.appendChild(notiText);
+        const [notiBox, notiProgress] = this.createNoti(node);
         // Determine height of noti.
         const notiHeight = notiBox.offsetHeight;
         if (this.currentHeight + notiHeight > window.innerHeight / 2) {
@@ -128,27 +143,25 @@ class DisplayList {
         }, resolution);
         return true;
     }
-    remove(node) {
-        // Empty list.
-        if (this.head === null) {
-            return;
-        }
-        // Remove from head.
-        if (this.head === node) {
-            this.head = this.head.next;
-            this.decrementNotiBoxes(node);
-            return;
-        }
-        // Remove from middle and tail.
-        let current = this.head;
-        while (current.next !== null) {
-            if (current.next === node) {
-                current.next = current.next.next;
-                this.decrementNotiBoxes(node);
-                return;
-            }
-            current = current.next;
-        }
+    createNoti(node) {
+        // Noti Box Container.
+        const notiBox = document.createElement("div");
+        notiBox.setAttribute("class", "open-noti-js");
+        // Noti Text.
+        const notiText = document.createElement("p");
+        notiText.appendChild(document.createTextNode(node.noti.message));
+        notiText.setAttribute("class", "open-noti-js");
+        // Noti Progress Bar.
+        const notiProgress = document.createElement("progress");
+        notiProgress.setAttribute("class", "open-noti-js");
+        notiProgress.max = 100;
+        // Render invisible noti to determine height.
+        notiBox.style.visibility = "hidden";
+        // Append elements to DOM.
+        document.body.appendChild(notiBox);
+        notiBox.appendChild(notiProgress);
+        notiBox.appendChild(notiText);
+        return [notiBox, notiProgress];
     }
     decrementNotiBoxes(deletedNode) {
         var _a, _b;
@@ -167,15 +180,6 @@ class DisplayList {
             }
             current = current.next;
         }
-    }
-    size() {
-        let count = 0;
-        let current = this.head;
-        while (current !== null) {
-            count++;
-            current = current.next;
-        }
-        return count;
     }
 }
 class OpenNotification {
