@@ -5,9 +5,6 @@ class NotiNode {
         this.next = null;
         this.noti = _noti;
     }
-    getNoti() {
-        return this.noti;
-    }
 }
 class WaitQueue {
     constructor() {
@@ -38,7 +35,7 @@ class WaitQueue {
         else {
             this.head = this.head.next;
         }
-        return node.getNoti();
+        return node.noti;
     }
     isEmpty() {
         return this.head === null;
@@ -100,47 +97,25 @@ class DisplayList {
         return count;
     }
     displayNoti(node) {
+        // Create noti hidden element and append to DOM.
         const [notiBox, notiProgress] = this.createNoti(node);
-        // Determine height of noti.
+        // Determine noti height.
         const notiHeight = notiBox.offsetHeight;
         if (this.currentHeight + notiHeight > window.innerHeight / 2) {
-            // Noti box will not fit on screen.
+            // Noti box will not fit on screen. Remove hidden noti and return.
             notiBox.remove();
             return false;
         }
         // Update noti box position.
-        const PADDING = 5; // Padding between consecutive noti boxes.
-        notiBox.style.bottom = `${this.currentHeight + PADDING}px`;
-        this.currentHeight += notiBox.offsetHeight + PADDING;
-        // Display noti.
+        this.setNotiPosition(notiBox);
+        // Display noti to user.
         notiBox.style.visibility = "visible";
-        // Update Node's DOMElement.
+        // Update NotiNode's DOMElement.
         node.DOMElement = notiBox;
         // Draw progress bar iteratively.
-        let step = 0; // Initial step.
-        const resolution = 30; // smoothness of the line.
-        let iter = setInterval(() => {
-            // Calculate step value using durationMS.
-            step += resolution / node.noti.duration;
-            let curProgress = notiProgress.max * step;
-            notiProgress.value = curProgress;
-            // Remove noti if the user clicks on it.
-            notiBox.addEventListener("click", () => {
-                clearInterval(iter);
-                // Remove noti from list.
-                this.remove(node);
-                // Remove noti from DOM.
-                notiBox.remove();
-            });
-            // Remove noti when progress is 100%.
-            if (curProgress >= 100) {
-                clearInterval(iter);
-                // Remove noti from list.
-                this.remove(node);
-                // Remove noti from DOM.
-                notiBox.remove();
-            }
-        }, resolution);
+        const iterID = this.handleProgressBar(node, notiBox, notiProgress);
+        // Remove noti if the user clicks on it.
+        this.handleNotiClick(iterID, node, notiBox);
         return true;
     }
     createNoti(node) {
@@ -162,6 +137,39 @@ class DisplayList {
         notiBox.appendChild(notiProgress);
         notiBox.appendChild(notiText);
         return [notiBox, notiProgress];
+    }
+    setNotiPosition(notiBox) {
+        const PADDING = 5; // Padding between consecutive noti boxes.
+        notiBox.style.bottom = `${this.currentHeight + PADDING}px`;
+        this.currentHeight += notiBox.offsetHeight + PADDING;
+    }
+    handleProgressBar(node, notiBox, notiProgress) {
+        let step = 0; // Initial step.
+        const resolution = 30; // smoothness of line animation.
+        let iterID = setInterval(() => {
+            // Calculate step value using durationMS.
+            step += resolution / node.noti.duration; // Calculate step value using the duration given.
+            let curProgress = notiProgress.max * step; // Find current progress.
+            notiProgress.value = curProgress;
+            // Remove noti when progress is 100%.
+            if (curProgress >= 100) {
+                clearInterval(iterID);
+                // Remove noti from list.
+                this.remove(node);
+                // Remove noti from DOM.
+                notiBox.remove();
+            }
+        }, resolution);
+        return iterID;
+    }
+    handleNotiClick(iterID, node, notiBox) {
+        notiBox.addEventListener("click", () => {
+            clearInterval(iterID);
+            // Remove noti from list.
+            this.remove(node);
+            // Remove noti from DOM.
+            notiBox.remove();
+        });
     }
     decrementNotiBoxes(deletedNode) {
         var _a, _b;

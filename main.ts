@@ -14,10 +14,6 @@ class NotiNode<Noti> {
     constructor(_noti: Noti) {
         this.noti = _noti;
     }
-
-    public getNoti(): Noti {
-        return this.noti;
-    }
 }
 
 
@@ -54,7 +50,7 @@ class WaitQueue implements IQueue {
         } else {
             this.head = this.head.next;
         }
-        return node.getNoti();
+        return node.noti;
     }
 
     public isEmpty(): boolean {
@@ -124,47 +120,27 @@ class DisplayList implements ILinkedList {
     }
 
     private displayNoti(node: NotiNode<Noti>): boolean {
+        // Create noti hidden element and append to DOM.
         const [notiBox, notiProgress] = this.createNoti(node);
-        // Determine height of noti.
+
+        // Determine noti height.
         const notiHeight = notiBox.offsetHeight;
         if (this.currentHeight + notiHeight > window.innerHeight / 2) {
-            // Noti box will not fit on screen.
+            // Noti box will not fit on screen. Remove hidden noti and return.
             notiBox.remove();
             return false;
         }
         // Update noti box position.
-        const PADDING = 5;  // Padding between consecutive noti boxes.
-        notiBox.style.bottom = `${this.currentHeight + PADDING}px`;
-        this.currentHeight += notiBox.offsetHeight + PADDING;
-        // Display noti.
+        this.setNotiPosition(notiBox);
+        // Display noti to user.
         notiBox.style.visibility = "visible";
-        // Update Node's DOMElement.
+        // Update NotiNode's DOMElement.
         node.DOMElement = notiBox;
+
         // Draw progress bar iteratively.
-        let step = 0;           // Initial step.
-        const resolution = 30;  // smoothness of the line.
-        let iter = setInterval(() => {
-            // Calculate step value using durationMS.
-            step += resolution / node.noti.duration;
-            let curProgress = notiProgress.max * step;
-            notiProgress.value = curProgress;
-            // Remove noti if the user clicks on it.
-            notiBox.addEventListener("click", () => {
-                clearInterval(iter);
-                // Remove noti from list.
-                this.remove(node);
-                // Remove noti from DOM.
-                notiBox.remove();
-            });
-            // Remove noti when progress is 100%.
-            if (curProgress >= 100) {
-                clearInterval(iter);
-                // Remove noti from list.
-                this.remove(node);
-                // Remove noti from DOM.
-                notiBox.remove();
-            }
-        }, resolution);
+        const iterID = this.handleProgressBar(node, notiBox, notiProgress);
+        // Remove noti if the user clicks on it.
+        this.handleNotiClick(iterID, node, notiBox);
         return true;
     }
 
@@ -191,6 +167,46 @@ class DisplayList implements ILinkedList {
     }
 
 
+    private setNotiPosition(notiBox: HTMLElement): void {
+        const PADDING = 5;  // Padding between consecutive noti boxes.
+        notiBox.style.bottom = `${this.currentHeight + PADDING}px`;
+        this.currentHeight += notiBox.offsetHeight + PADDING;
+    }
+
+
+    private handleProgressBar(node: NotiNode<Noti>, notiBox: HTMLElement, notiProgress: HTMLProgressElement): number {
+        let step = 0;           // Initial step.
+        const resolution = 30;  // smoothness of line animation.
+        let iterID = setInterval(() => {
+            // Calculate step value using durationMS.
+            step += resolution / node.noti.duration;    // Calculate step value using the duration given.
+            let curProgress = notiProgress.max * step;  // Find current progress.
+            notiProgress.value = curProgress;
+
+            // Remove noti when progress is 100%.
+            if (curProgress >= 100) {
+                clearInterval(iterID);
+                // Remove noti from list.
+                this.remove(node);
+                // Remove noti from DOM.
+                notiBox.remove();
+            }
+        }, resolution);
+        return iterID
+    }
+
+
+    private handleNotiClick(iterID: number, node: NotiNode<Noti>, notiBox: HTMLElement): void {
+        notiBox.addEventListener("click", () => {
+            clearInterval(iterID);
+            // Remove noti from list.
+            this.remove(node);
+            // Remove noti from DOM.
+            notiBox.remove();
+        });
+    }
+
+
     decrementNotiBoxes(deletedNode: NotiNode<Noti>): void {
         const PADDING = 5;
         const remHeight = deletedNode.DOMElement?.offsetHeight ?? 0;
@@ -213,8 +229,8 @@ class DisplayList implements ILinkedList {
 
 
 class OpenNotification {
-    private notiQueue: WaitQueue = new WaitQueue();
-    private notiList: DisplayList = new DisplayList();
+    private readonly notiQueue: WaitQueue = new WaitQueue();
+    private readonly notiList: DisplayList = new DisplayList();
 
     constructor() {
         this.startNotiScanner();
