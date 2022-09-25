@@ -18,9 +18,9 @@ jobs:
       with:
         node-version: 12
                 
-    - name: TypeScript Build and Push
+    - name: TypeScript Build and Publish to Release
       uses: alexthemaster/action-build-typescript@v1.2.1
       with:
         pushToBranch: true
-        branch: 'dist'
+        branch: 'release'
         githubToken: ${{ secrets.GITHUB_TOKEN }}
