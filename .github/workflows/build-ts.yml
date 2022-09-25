@@ -1,5 +1,4 @@
-name: C/C++ CI
-
+name: Typescript CI
 on:
   push:
     branches: [ "main", "dev" ]
