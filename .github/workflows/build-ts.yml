@@ -23,4 +23,4 @@ jobs:
       with:
         pushToBranch: true
         branch: 'dist'
-        githubToken: ${{ secrets.GITHUB_TOKEN }}
+        githubToken: ${{ secrets.REPO_PAT }}
