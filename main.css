@@ -1,3 +1,9 @@
+root {
+    --noti-background: #212121;
+    --progress-bar-color-start: #09c;
+    --progress-bar-color-end: #f44;
+}
+
 @keyframes flyInRight {
     0% { transform: translateX(100%); }
     70% { transform: translateX(-10%); }
@@ -95,13 +101,18 @@ div.open-noti-js {
 
 .open-noti-js progress[value]::-webkit-progress-value {
     background-image:
+            /* Angled stripes */
             -webkit-linear-gradient(-45deg,
             transparent 33%, rgba(0, 0, 0, .1) 33%,
             rgba(0,0, 0, .1) 66%, transparent 66%),
+            /* Top-Down linear gradient*/
             -webkit-linear-gradient(top,
             rgba(255, 255, 255, .25),
             rgba(0, 0, 0, .25)),
-            -webkit-linear-gradient(left, #09c, #f44);
+            /* Left-Right linear gradient*/
+            -webkit-linear-gradient(left,
+            var(--progress-bar-color-start),
+            var(--progress-bar-color-end));
 
     border-radius: 3px;
     background-size: 35px 20px, 100% 100%, 100% 100%;
