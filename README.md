@@ -1,4 +1,4 @@
-# Open Notification JS (OPN)
+# Open Notifications JS (OPN)
 
 [![Build Status](https://github.com/kinda-raffy/open-notifications-js/actions/workflows/build-publish.yml/badge.svg?branch=main)](https://github.com/kinda-raffy/open-notifications-js/actions/workflows/build-publish.yml/badge.svg?branch=main)
 
